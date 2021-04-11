@@ -147,7 +147,8 @@ def train(speaker, X, M=8, epsilon=0.0, maxIter=20):
     prev_l = -np.inf
     improvement = np.inf
     while i < maxIter and improvement >= epsilon:
-        log_Bs = np.array([log_b_m_x(m, X, myTheta) for m in range(M)])  # (M, t)
+        log_Bs = np.array(
+            [log_b_m_x(m, X, myTheta) for m in range(M)])  # (M, t)
         log_Ps = log_p_m_x(log_Bs, myTheta)  # (M, t)
         l = logLik(log_Bs, myTheta)
         myTheta = update(myTheta, log_Ps, X, M)
@@ -171,11 +172,12 @@ def update(myTheta, log_Ps, X, M):
     p_tile_md = np.tile(p_sum, D).reshape(M, D)  # (M, D)
     updated_mu = np.dot(p_tile_mt, X) / p_tile_md  # (M, D)
     myTheta.reset_mu(updated_mu)
-    #update sigma
+    # update sigma
     updated_sigma = np.dot(p_tile_mt, X ** 2) / p_tile_md - (updated_mu ** 2)
     myTheta.reset_Sigma(updated_sigma)
 
     return myTheta
+
 
 def test(mfcc, correctID, models, k=5):
     """ Computes the likelihood of 'mfcc' in each model in 'models', where the correct model is 'correctID'
