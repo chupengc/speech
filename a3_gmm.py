@@ -23,14 +23,14 @@ def log_b_m_x( m, x, myTheta, preComputedForM=[]):
     '''
     print ( 'TODO' )
 
-    
+
 def log_p_m_x( m, x, myTheta):
     ''' Returns the log probability of the m^{th} component given d-dimensional vector x, and model myTheta
         See equation 2 of handout
     '''
     print ( 'TODO' )
 
-    
+
 def logLik( log_Bs, myTheta ):
     ''' Return the log likelihood of 'X' using model 'myTheta' and precomputed MxT matrix, 'log_Bs', of log_b_m_x
 
@@ -39,13 +39,13 @@ def logLik( log_Bs, myTheta ):
 
         We don't actually pass X directly to the function because we instead pass:
 
-        log_Bs(m,t) is the log probability of vector x_t in component m, which is computed and stored outside of this function for efficiency. 
+        log_Bs(m,t) is the log probability of vector x_t in component m, which is computed and stored outside of this function for efficiency.
 
         See equation 3 of the handout
     '''
     print( 'TODO' )
 
-    
+
 def train( speaker, X, M=8, epsilon=0.0, maxIter=20 ):
     ''' Train a model for the given speaker. Returns the theta (omega, mu, sigma)'''
     myTheta = theta( speaker, M, X.shape[1] )
@@ -60,7 +60,7 @@ def test( mfcc, correctID, models, k=5 ):
                [SNAME1] [LOGLIK1]
                [SNAME2] [LOGLIK2]
                ...
-               [SNAMEK] [LOGLIKK] 
+               [SNAMEK] [LOGLIKK]
 
         e.g.,
                S-5A -9.21034037197
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
             files = fnmatch.filter(os.listdir( os.path.join( dataDir, speaker ) ), '*npy')
             random.shuffle( files )
-            
+
             testMFCC = np.load( os.path.join( dataDir, speaker, files.pop() ) )
             testMFCCs.append( testMFCC )
 
@@ -99,9 +99,9 @@ if __name__ == "__main__":
 
             trainThetas.append( train(speaker, X, M, epsilon, maxIter) )
 
-    # evaluate 
+    # evaluate
     numCorrect = 0;
     for i in range(0,len(testMFCCs)):
-        numCorrect += test( testMFCCs[i], i, trainThetas, k ) 
+        numCorrect += test( testMFCCs[i], i, trainThetas, k )
     accuracy = 1.0*numCorrect/len(testMFCCs)
 

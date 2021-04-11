@@ -1,4 +1,5 @@
 from sklearn.model_selection import train_test_split
+from scipy.special import logsumexp
 import numpy as np
 import os, fnmatch
 import random
@@ -25,7 +26,10 @@ class theta:
         This should output a float or equivalent (array of size [1] etc.)
         NOTE: use this in `log_b_m_x` below
         """
-        print("TODO")
+        pre1 = (self._d / 2) * np.log(2 * np.pi)
+        pre2 = 0.5 * np.log(self.Sigma[m]).sum()
+
+        return -pre1 - pre2
 
     def reset_omega(self, omega):
         """Pass in `omega` of shape [M, 1] or [M]
@@ -67,7 +71,19 @@ def log_b_m_x(m, x, myTheta):
     But we encourage you to use the vectorized version in your `train`
     function for faster/efficient computation.
     """
-    print("TODO")
+    mu = myTheta.mu[m]  # (d, )
+    sigma = myTheta.Sigma[m]  # (d, )
+    d = mu.shape[1]
+    const = myTheta.precomputedForM(m)
+    if x.shape == (d,):
+        term = (x - mu) ** 2 / 2 * sigma
+        term = term.sum()  # (d, )
+    else:
+        mu = np.tile(mu, (x.shape[0], 1))  # (T, d)
+        term = (x - mu) ** 2 / 2 * sigma
+        term = term.sum(axis=1)  # (T, )
+
+    return -term + const
 
 
 def log_p_m_x(log_Bs, myTheta):
@@ -83,7 +99,14 @@ def log_p_m_x(log_Bs, myTheta):
 
     NOTE: For a description of `log_Bs`, refer to the docstring of `logLik` below
     """
-    print("TODO")
+    m, t = log_Bs.shape
+    omega = myTheta.omega  # (M, 1)
+    log_omega = np.log(np.tile(omega, (1, t)))  # (M, T)
+    term1 = log_omega + log_Bs
+    log_sum = logsumexp(np.multiply(log_omega, log_Bs), axis=0)  # (T, )
+    term2 = np.tile(log_sum, (m, 1))  # (M, T)
+
+    return term1 - term2
 
 
 def logLik(log_Bs, myTheta):
@@ -98,22 +121,41 @@ def logLik(log_Bs, myTheta):
 
         See equation 3 of the handout
     """
-    print("TODO")
+    m, t = log_Bs.shape
+    omega = myTheta.omega
+    log_omega = np.log(np.tile(omega, (1, t)))  # (M, T)
+    log_sum = logsumexp(np.multiply(log_omega, log_Bs), axis=0)  # (T, )
+    log_lik = log_sum
+
+    return log_lik
 
 
 def train(speaker, X, M=8, epsilon=0.0, maxIter=20):
-    """ Train a model for the given speaker. Returns the theta (omega, mu, sigma)"""
+    """ Train a model for the given speaker. Returns the theta (omega, mu,
+    sigma) """
     myTheta = theta(speaker, M, X.shape[1])
-    # perform initialization (Slide 32)
-    print("TODO : Initialization")
-    # for ex.,
-    # myTheta.reset_omega(omegas_with_constraints)
-    # myTheta.reset_mu(mu_computed_using_data)
-    # myTheta.reset_Sigma(some_appropriate_sigma)
+    # initialization
+    n, d = X.shape
+    init_omega = np.array(1 / M for m in range(M))  # (M, )
+    init_mu = np.array([X[np.random.randint(n)] for m in range(M)])  # (M, d)
+    init_sigma = np.ones((M, d))  # (M, d)
+    myTheta.reset_omega(init_omega)
+    myTheta.reset_mu(init_mu)
+    myTheta.reset_Sigma(init_sigma)
 
-    print("TODO: Rest of training")
+    i = 0
+    prev_l = -np.inf
+    improvement = np.inf
+    while i < maxIter and improvement >= epsilon:
+        log_Bs = np.array([log_b_m_x(m, X, myTheta) for m in range(M)])
+        curr_l = logLik(log_Bs, myTheta)
+
 
     return myTheta
+
+
+def update():
+
 
 
 def test(mfcc, correctID, models, k=5):
@@ -151,7 +193,8 @@ if __name__ == "__main__":
         for speaker in dirs:
             print(speaker)
 
-            files = fnmatch.filter(os.listdir(os.path.join(dataDir, speaker)), "*npy")
+            files = fnmatch.filter(os.listdir(os.path.join(dataDir, speaker)),
+                                   "*npy")
             random.shuffle(files)
 
             testMFCC = np.load(os.path.join(dataDir, speaker, files.pop()))

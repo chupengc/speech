@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="381384c8-7408-4a11-87bf-5122d94e841e" name="teach.cs">
+        <fileTransfer rootFolder="/h/u7/c9/01/chupengc" accessType="SFTP" host="teach.cs.toronto.edu" port="22" sshConfigId="7b9472ff-a2dd-4a58-8342-cbdc5184096f" sshConfig="chupengc@teach.cs.toronto.edu:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
