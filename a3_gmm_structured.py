@@ -125,7 +125,7 @@ def logLik(log_Bs, myTheta):
     omega = myTheta.omega
     log_omega = np.log(np.tile(omega, (1, t)))  # (M, T)
     log_sum = logsumexp(np.multiply(log_omega, log_Bs), axis=0)  # (T, )
-    log_lik = log_sum
+    log_lik = log_sum.sum()
 
     return log_lik
 
@@ -135,9 +135,9 @@ def train(speaker, X, M=8, epsilon=0.0, maxIter=20):
     sigma) """
     myTheta = theta(speaker, M, X.shape[1])
     # initialization
-    n, d = X.shape
+    t, d = X.shape
     init_omega = np.array(1 / M for m in range(M))  # (M, )
-    init_mu = np.array([X[np.random.randint(n)] for m in range(M)])  # (M, d)
+    init_mu = np.array([X[np.random.randint(t)] for m in range(M)])  # (M, d)
     init_sigma = np.ones((M, d))  # (M, d)
     myTheta.reset_omega(init_omega)
     myTheta.reset_mu(init_mu)
@@ -147,16 +147,35 @@ def train(speaker, X, M=8, epsilon=0.0, maxIter=20):
     prev_l = -np.inf
     improvement = np.inf
     while i < maxIter and improvement >= epsilon:
-        log_Bs = np.array([log_b_m_x(m, X, myTheta) for m in range(M)])
-        curr_l = logLik(log_Bs, myTheta)
-
+        log_Bs = np.array([log_b_m_x(m, X, myTheta) for m in range(M)])  # (M, t)
+        log_Ps = log_p_m_x(log_Bs, myTheta)  # (M, t)
+        l = logLik(log_Bs, myTheta)
+        myTheta = update(myTheta, log_Ps, X, M)
+        improvement = l - prev_l
+        prev_l = l
+        i += 1
 
     return myTheta
 
 
-def update():
+def update(myTheta, log_Ps, X, M):
+    T, D = X.shape
+    p = np.exp(log_Ps)  # (M, t)
+    p_sum = p.sum(axis=1)  # (M, )
 
+    # update omega
+    updated_omega = p_sum / T  # (M, )
+    myTheta.reset_omega(updated_omega)
+    # update mu
+    p_tile_mt = np.tile(p_sum, T).reshape(M, T)  # (M, T)
+    p_tile_md = np.tile(p_sum, D).reshape(M, D)  # (M, D)
+    updated_mu = np.dot(p_tile_mt, X) / p_tile_md  # (M, D)
+    myTheta.reset_mu(updated_mu)
+    #update sigma
+    updated_sigma = np.dot(p_tile_mt, X ** 2) / p_tile_md - (updated_mu ** 2)
+    myTheta.reset_Sigma(updated_sigma)
 
+    return myTheta
 
 def test(mfcc, correctID, models, k=5):
     """ Computes the likelihood of 'mfcc' in each model in 'models', where the correct model is 'correctID'
