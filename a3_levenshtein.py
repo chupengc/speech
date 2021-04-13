@@ -98,12 +98,6 @@ def preprocess(s):
 
 
 if __name__ == "__main__":
-    # w, s, i, d = Levenshtein("who is there".split(), "is there".split())
-    # print(w, s, i, d)
-    # w, s, i, d = Levenshtein("who is there".split(), "".split())
-    # print(w, s, i, d)
-    # w, s, i, d = Levenshtein("".split(), "who is there".split())
-    # print(w, s, i, d)
 
     transcripts = ["transcripts.txt", "transcripts.Kaldi.txt",
                    "transcripts.Google.txt"]
@@ -133,7 +127,7 @@ if __name__ == "__main__":
                 print("{} Kaldi {} {} S:{}, I:{}, D:{}".format(speaker, i, wer_k, sub_k, insert_k, delete_k))
                 print("{} Google {} {} S:{}, I:{}, D:{}".format(speaker, i, wer_g, sub_g, insert_g, delete_g))
 
-    print("Kaidi")
+    print("Kaldi")
     print("average: {},  standard deviation:{}".format(np.average(wer_kaldi), np.std(wer_kaldi)))
     print("Google")
     print("average: {},  standard deviation:{}".format(np.average(wer_google), np.std(wer_google)))

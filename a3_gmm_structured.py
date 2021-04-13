@@ -73,29 +73,23 @@ def log_b_m_x(m, x, myTheta):
     But we encourage you to use the vectorized version in your `train`
     function for faster/efficient computation.
     """
-    # mu = myTheta.mu[m]  # (d, )
-    # sigma = myTheta.Sigma[m]  # (d, )
-    # d = mu.shape[0]
-    # const = myTheta.precomputedForM(m)
-    # if x.shape == (d,):
-    #     term = x ** 2 / 2 * sigma - x * mu / sigma  # (d, )
-    #     term = -term.sum()  # (d, )
-    # else:
-    #     mu = np.tile(mu, (x.shape[0], 1))  # (T, d)
-    #     term = x ** 2 / 2 * sigma - x * mu / sigma  # (T, d)
-    #     term = -term.sum(axis=1)  # (T, )
-    #
-    # return term - const
+    mu = myTheta.mu[m]  # (d, )
+    d = mu.shape[0]
+    sigma = myTheta.Sigma[m].reshape(1, d)  # (1, d)
+    const = myTheta.precomputedForM(m)
 
-    mu = myTheta.mu[m]
-    sigma = np.expand_dims(myTheta.Sigma[m], 0)
-    if len(x.shape) == 1:
-        x = np.expand_dims(x, 0)
-    log_bmx = - np.einsum('ij,ji->i', x / sigma, x.T) / 2
-    log_bmx += (x / sigma) @ mu
-    log_bmx -= myTheta.precomputedForM(m)
-    # print(log_bmx)
-    return log_bmx
+    if x.shape == (d,):
+        x = x.reshape(1, d)
+        term = 0.5 * np.einsum('ij,ji->i', x / sigma, x.T) - np.dot((x / sigma), mu)
+        result = -term - const
+        result = float(result)
+
+    else:
+        term = 0.5 * np.einsum('ij,ji->i', x / sigma, x.T) - np.dot((x / sigma), mu)
+        result = -term - const
+
+    return result
+
 
 def log_p_m_x(log_Bs, myTheta):
     """ Returns the matrix of log probabilities i.e. log of p(m|X;theta)
@@ -135,10 +129,6 @@ def logLik(log_Bs, myTheta):
     log_lik = log_sum.sum()
 
     return log_lik
-
-
-def sumexp(a, b, axis=0):
-    return np.exp(a-b).sum(axis=axis, keepdims=True)
 
 
 def train(speaker, X, M=8, epsilon=0.0, maxIter=20):
