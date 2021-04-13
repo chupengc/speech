@@ -1,0 +1,3 @@
+Experiments
+1. With the default number of Gaussians components M=8, we consistently achieve high accuracies (around 96%). 
+As the number of components decreases, the classification accuracy also decreases.

@@ -1,0 +1,22 @@
+model configuration:
+
+self.gru = nn.GRU(input_size, hidden_size, 1)
+self.classifier = nn.Linear(hidden_size, 2)
+
+-------------------------------------------------
+
+detection performance:
+
+hidden size 5
+Model test accuracy: 0.323
+hidden size 10
+Model test accuracy: 0.355
+hidden size 50
+Model test accuracy: 0.581
+
+-------------------------------------------------
+
+As the number of features in the hidden state increases, we can obeserve an increasing trend 
+of accuracy. This could be due to the fact that while we increase the hidden size, we are also 
+increasing the complexity of the GRU model, therefore the model has the potential to capture 
+more features in the hidden state and make more accurate prediction.

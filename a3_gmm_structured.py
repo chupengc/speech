@@ -236,9 +236,9 @@ if __name__ == "__main__":
     # print("TODO: you will need to modify this main block for Sec 2.3")
     d = 13
     k = 5  # number of top speakers to display, <= 0 if none
-    M = 6
+    M = 8
     epsilon = 0.0
-    maxIter = 20
+    maxIter = 5
     # train a model for each speaker, and reserve data for testing
 
     for subdir, dirs, files in os.walk(dataDir):
