@@ -1,3 +1,23 @@
-Experiments
 1. With the default number of Gaussians components M=8, we consistently achieve high accuracies (around 96%). 
-As the number of components decreases, the classification accuracy also decreases.
+As the number of components decreases, the classification accuracy also decreases. This shows that an incorrect
+ number of components would often fail to accurately represent the underlying distribution of the data. This could 
+be a result of the model underfitting the data, in contrast to the idea of the model overfitting the data when M 
+is too large as discussed in class.
+
+2. As the number of maxIter decreases, the classification accuracy does not seem to change much. The model still 
+achieves high accuracy (around 96%) even with only 5 max iterations, and only slightly less with 1 iteration 
+(around 94%). This shows that the model can perform pretty well even without significant amount of training/iterations. 
+
+3. To improve the classification accuracy of the Gaussian mixtures without adding more training data, we should focus 
+on tuning the hyperparameters. As discussed in the previous parts, a bad choice of hyperparameter (M, maxiter, epsilon, 
+etc) can result in significantly worse result, so tuning the hyperparameters are the most direct way to improve 
+accuracy without adding more training data.
+
+4. It is unlikely that the classifier would decide that a given test utterance comes from none of the trained speaker
+models. The model should pick the speaker model that has the highest likelihood among all models, even when the 
+likelihood is low.
+
+5. Recurrent neural networks can be useful for performing speaker identification tasks. In addition to the traditional 
+LSTM model, it is shown in some research that the Transformer model has achieve some significant breakthough in the 
+area of speaker identification.
+

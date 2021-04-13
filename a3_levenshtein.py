@@ -87,7 +87,7 @@ def Levenshtein(r, h):
     if len(r) - 2 == 0:
         wer = float("inf")
     else:
-        wer = R[-1, -1] / (len(r) - 2)
+        wer = (R[-1, -1] / (len(r) - 2)) * 100
 
     return round(wer, 3), sub, insert, delete
 

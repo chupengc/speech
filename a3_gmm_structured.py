@@ -228,7 +228,7 @@ if __name__ == "__main__":
     k = 5  # number of top speakers to display, <= 0 if none
     M = 8
     epsilon = 0.0
-    maxIter = 5
+    maxIter = 1
     # train a model for each speaker, and reserve data for testing
 
     for subdir, dirs, files in os.walk(dataDir):
